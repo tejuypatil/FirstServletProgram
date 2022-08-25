@@ -34,17 +34,25 @@ public class LoginServlet extends HttpServlet {
             return;
         }
         String pwd = request.getParameter("pwd");
+        if(!isValidPassword(pwd)){
+            RequestDispatcher rd = getServletContext().getRequestDispatcher("/login.html");
+            PrintWriter out = response.getWriter();
+            out.println("<font color=red>User password is wrong.</font>");
+            rd.include(request, response);
+            return;
+        }
         String userID = getServletConfig().getInitParameter("user");
         String password = getServletConfig().getInitParameter("password");
         if (userID.equals(user) && password.equals(pwd)) {
             request.setAttribute("user", user);
             request.getRequestDispatcher("LoginSuccess.jsp").forward(request, response);
 
-        } else {
-            RequestDispatcher rd = getServletContext().getRequestDispatcher("/login.html");
-            PrintWriter out = response.getWriter();
-            out.println("<font color=red>Either user name or password is wrong .</font>");
-            rd.include(request, response);
+        }
+       else {
+           RequestDispatcher rd = getServletContext().getRequestDispatcher("/login.html");
+           PrintWriter out = response.getWriter();
+           out.println("<font color=red>Either user name or password is wrong .</font>");
+           rd.include(request, response);
         }
     }
     public static boolean isValidUserName(String userName){
@@ -57,6 +65,19 @@ public class LoginServlet extends HttpServlet {
         }
         else {
             System.out.println("User Name is Invalid");
+            return false;
+        }
+    }
+    public static boolean isValidPassword(String userPassword){
+        String regex = "^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[*.!@#$%^&(){}:;<>?/~_+-=|\\]]).{8,}";
+        Pattern patternChecker = Pattern.compile(regex);
+        Matcher matchChecker = patternChecker.matcher(userPassword);
+        if(matchChecker.matches()){
+            System.out.println("Valid Password");
+            return true;
+        }
+        else{
+            System.out.println("Invalid Password");
             return false;
         }
     }
